@@ -1,0 +1,28 @@
+# RDMA READ response message contained too much or too little payload data.
+# TODO: add too much case
+# TODO: rxe can can not deal with response with length error.
+
+side_1: 
+  - name: prepare
+  - name: connect_qp
+  - name: barrier
+  - name: remote_read
+    len: 8
+  - name: local_check
+    seg: 
+      - offset: 0 
+        expected: 'ff'
+  - name: check_qp_status
+    status: ERR
+
+side_2:
+  - name: prepare
+  - name: connect_qp
+  - name: set_hook
+    hook_type: resp
+    hook_name: length_err_hook
+  - name: local_write
+    offset: 0
+    content: 'ff'
+  - name: barrier
+  - name: recv_pkt

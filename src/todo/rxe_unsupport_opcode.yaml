@@ -1,0 +1,24 @@
+# TODO: enable roce-sim response Nak_invlide
+
+side_1:
+  - name: prepare
+  - name: connect_qp
+  - name: barrier
+  - name: remote_read
+    allow_err: true
+    len: 1
+
+side_2: 
+  - name: prepare
+  - name: connect_qp
+  - name: set_hook
+    hook_type: recv
+    hook_name: rxe_unsupported_opcode_hook
+  - name: barrier
+  - name: recv_pkt
+    check_pkt:
+      - header: BTH
+        field: opcode
+        expect: 31
+  - name: check_qp_status
+    status: RTS
