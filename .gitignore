@@ -2,6 +2,5 @@
 /src/proto/*rs
 /src/proto/*py
 Cargo.lock
-/.vscode/
 *.pyc
 *.log
