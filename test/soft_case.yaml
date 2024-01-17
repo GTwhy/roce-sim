@@ -15,8 +15,10 @@ side_1:
   # 3 for soft-roce(as default), 2 for hardware devices.
   imm_flag: 3
 # test all cases in `scr/case/` if `test_all: true`
-test_all: true
+test_all: false
+# test_all: true
 # test specified cases if `test_all: false`
 test_cases:
   # add specified test cases' names in `src/case/` like `- "read_success"`
-  - "read_success"
+  - "remote_operation_err"
+  

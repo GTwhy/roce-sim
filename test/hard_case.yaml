@@ -1,22 +1,22 @@
 side_2:
   # Python Side
-  ip: "10.1.1.48"
+  ip: "192.168.9.254"
   port: 9000
   dev_name: ""
   ib_port: 1
   gid_idx: 1
 side_1:
   # Rust Side
-  ip: "10.1.1.15"
+  ip: "192.168.9.2"
   port: 9000
-  dev_name: ""
+  dev_name: "rocep65s0f0"
   ib_port: 1
-  gid_idx: 1
+  gid_idx: 3
   # 3 for soft-roce(as default), 2 for hardware devices.
-  imm_flag: 3
+  imm_flag: 2
 # test all cases in `scr/case/` if `test_all: true`
-test_all: true
+test_all: false
 # test specified cases if `test_all: false`
 test_cases:
   # add specified test cases' names in `src/case/` like `- "read_success"`
-  - "read_success"
+  - "rxe_read_success"

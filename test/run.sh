@@ -13,19 +13,20 @@ CONTAINER_SERVER_IP="10.1.1.48"
 CONTAINER_CLIENT_IP="10.1.1.64"
 CONTAINER_IP="10.1.1.48"
 GRPC_PORT="9000"
+PARENT_NIC_NAME="eno1"
 
 # Create MacVLAN network for container to assign static IP
-docker network create -d macvlan --subnet=$CONTAINER_NET --ip-range=$CONTAINER_NET -o macvlan_mode=bridge -o parent=eth0 $DOCKER_NETWORK
+docker network create -d macvlan --subnet=$CONTAINER_NET --ip-range=$CONTAINER_NET -o macvlan_mode=bridge -o parent=$PARENT_NIC_NAME $DOCKER_NETWORK
 # Make host and container accessible
 # https://rehtt.com/index.php/archives/236/
-sudo ip link add $LINK_DEV_NAME link eth0 type macvlan mode bridge
+sudo ip link add $LINK_DEV_NAME link $PARENT_NIC_NAME type macvlan mode bridge
 sudo ip addr add $LINK_DEV_IP dev $LINK_DEV_NAME
 sudo ip link set $LINK_DEV_NAME up
 sudo ip route add ${CONTAINER_NET} dev $LINK_DEV_NAME
 
 cd src/basic_test
 
-docker kill `docker ps -a -q` || true # Clean all pending containers to release IP
+docker kill $(docker ps -a -q --filter "name=python_side") || true # Clean all pending python_side containers to release IP
 docker run --rm -d -v `pwd`:`pwd` -w `pwd` --net=mymacvlan --ip=$CONTAINER_SERVER_IP --name exch_server python:3 python3 exch_server.py
 sleep 1 # Wait a while for server to ready
 docker run --rm -v `pwd`:`pwd` -w `pwd` --net=mymacvlan --ip=$CONTAINER_CLIENT_IP --name exch_client python:3 python3 exch_client.py -s $CONTAINER_SERVER_IP
@@ -56,7 +57,7 @@ sed -i "s/SIDE_2_PORT/${GRPC_PORT}/g" ./case.yaml
 cd ../
 
 ## Remove existing devices if any
-RXE_DEV=rxe_eth0
+RXE_DEV=rxe
 sudo rdma link delete $RXE_DEV || true
 
 sudo rdma link add $RXE_DEV type rxe netdev ${LINK_DEV_NAME}
